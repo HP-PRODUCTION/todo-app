@@ -1,0 +1,44 @@
+/* ==========================================================================
+   dark-mode.css  – Dark theme overrides
+   Applied when <html data-theme="dark">
+   ========================================================================== */
+
+[data-theme="dark"] {
+  --clr-bg:          #0f1117;
+  --clr-surface:     #1a1d27;
+  --clr-surface-alt: #21253a;
+  --clr-border:      #2e3349;
+  --clr-text:        #e2e8f0;
+  --clr-text-muted:  #8892a4;
+  --clr-primary:     #818cf8;
+  --clr-primary-hover:#6366f1;
+  --clr-success:     #34d399;
+  --clr-warning:     #fbbf24;
+  --clr-danger:      #f87171;
+  --clr-info:        #60a5fa;
+
+  --shadow:    0 1px 3px rgba(0,0,0,.4), 0 1px 2px rgba(0,0,0,.3);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,.5), 0 2px 4px -1px rgba(0,0,0,.4);
+}
+
+[data-theme="dark"] .badge-high   { background: #3b1212; }
+[data-theme="dark"] .badge-medium { background: #3b2b04; }
+[data-theme="dark"] .badge-low    { background: #062618; }
+
+[data-theme="dark"] .priority-stat.high   { background: #3b1212; }
+[data-theme="dark"] .priority-stat.medium { background: #3b2b04; }
+[data-theme="dark"] .priority-stat.low    { background: #062618; }
+
+[data-theme="dark"] .form-control {
+  background: var(--clr-surface-alt);
+  color: var(--clr-text);
+}
+
+[data-theme="dark"] .form-control option {
+  background: var(--clr-surface-alt);
+  color: var(--clr-text);
+}
+
+[data-theme="dark"] .progress-track { background: #2e3349; }
+
+[data-theme="dark"] .stat-item { background: var(--clr-surface-alt); }
