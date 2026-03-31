@@ -30,9 +30,12 @@ Scripts are loaded in `index.html` in this exact order – **each module depends
 utils.js → storage.js → app.js → ui.js
 ```
 
-- `storage` uses only browser APIs (no dependency on other modules).
-- `app` depends on `utils` and `storage` and calls `ui` methods.
-- `ui` depends on `utils` and calls `app` methods.
+- `utils` has no dependencies on other modules.
+- `storage` uses only browser APIs (`localStorage`, `JSON`, `Blob`); it does not depend on other app modules.
+- `app` calls `utils` and `storage` directly, and calls `ui` methods (e.g., `ui.render()`, `ui.showNotification()`).
+- `ui` calls `utils` helpers and `app` methods (e.g., `app.addTask()`, `app.getFilteredTasks()`).
+
+> **Note on `app` ↔ `ui` interaction:** Both modules reference each other, but this is not a circular import problem because IIFEs assign globals at load time and the cross-references are only invoked inside functions that run *after* all scripts have loaded (starting from `app.init()` on `DOMContentLoaded`).
 
 **Never use `import`/`export` syntax or ES modules.** Always follow the existing IIFE pattern when adding or modifying JavaScript.
 
