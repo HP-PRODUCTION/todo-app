@@ -1,0 +1,12 @@
+{
+  "name": "todo-app",
+  "version": "1.0.0",
+  "description": "A fully-featured To-Do list app – vanilla JS/HTML/CSS, no frameworks.",
+  "main": "index.html",
+  "scripts": {
+    "start": "python3 -m http.server 8000"
+  },
+  "keywords": ["todo", "task-manager", "vanilla-js", "localStorage"],
+  "author": "",
+  "license": "MIT"
+}
