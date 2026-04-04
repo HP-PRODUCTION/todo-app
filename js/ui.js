@@ -11,6 +11,7 @@ const ui = (() => {
 
   // ── Edit state ────────────────────────────────────────────────────────
   let editingId = null;
+  let lastFocusedBeforeModal = null;
 
   // ══════════════════════════════════════════════════════════════════════
   //  init – wire up every interactive element
@@ -69,6 +70,7 @@ const ui = (() => {
     };
 
     _bindEvents();
+    _registerServiceWorker();
     // Pre-set sort selector from saved state
     if (els.sortSelect) els.sortSelect.value = app.getSortBy();
   }
@@ -139,6 +141,13 @@ const ui = (() => {
     // Modal
     els.modalCancel.addEventListener('click', _closeModal);
     els.modal.addEventListener('click', e => { if (e.target === els.modal) _closeModal(); });
+
+    // Global keyboard shortcuts
+    document.addEventListener('keydown', _handleGlobalShortcuts);
+
+    // Connectivity signals
+    window.addEventListener('offline', () => showNotification('You are offline. Changes remain local.', 'info'));
+    window.addEventListener('online', () => showNotification('Back online.', 'success'));
   }
 
   // ══════════════════════════════════════════════════════════════════════
@@ -147,7 +156,14 @@ const ui = (() => {
   function _handleFormSubmit(e) {
     e.preventDefault();
     const title = els.titleInput.value.trim();
-    if (!title) { _shake(els.titleInput); return; }
+    if (!title) {
+      _shake(els.titleInput);
+      els.titleInput.setAttribute('aria-invalid', 'true');
+      showNotification('Title is required.', 'error');
+      return;
+    }
+
+    els.titleInput.removeAttribute('aria-invalid');
 
     const desc     = els.descInput.value;
     const priority = els.prioritySelect.value;
@@ -169,6 +185,28 @@ const ui = (() => {
     els.formSubmitBtn.textContent = 'Add Task';
     els.formCancelBtn.classList.add('hidden');
     els.titleInput.focus();
+  }
+
+  function _handleGlobalShortcuts(e) {
+    const isInputLike = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
+
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      els.searchInput.focus();
+      els.searchInput.select();
+      return;
+    }
+
+    if (!isInputLike && e.key.toLowerCase() === 'n') {
+      e.preventDefault();
+      els.titleInput.focus();
+      return;
+    }
+
+    if (e.key === 'Escape' && els.modal && !els.modal.classList.contains('hidden')) {
+      e.preventDefault();
+      _closeModal();
+    }
   }
 
   function _startEdit(task) {
@@ -414,6 +452,7 @@ const ui = (() => {
   let _modalCallback = null;
 
   function showConfirm(message, callback) {
+    lastFocusedBeforeModal = document.activeElement;
     els.modalMsg.textContent = message;
     _modalCallback = callback;
     els.modal.classList.remove('hidden');
@@ -429,6 +468,19 @@ const ui = (() => {
     els.modal.classList.add('hidden');
     els.modal.setAttribute('aria-hidden', 'true');
     _modalCallback = null;
+    if (lastFocusedBeforeModal && typeof lastFocusedBeforeModal.focus === 'function') {
+      lastFocusedBeforeModal.focus();
+    }
+  }
+
+  function _registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').catch(err => {
+        console.warn('Service worker registration failed:', err);
+      });
+    });
   }
 
   // ══════════════════════════════════════════════════════════════════════

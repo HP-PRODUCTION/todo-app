@@ -1,0 +1,12 @@
+{
+  "name": "Todo App",
+  "short_name": "Todo",
+  "description": "Client-side todo manager with filters, priorities and offline support.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#4f46e5",
+  "lang": "en",
+  "categories": ["productivity", "utilities"]
+}

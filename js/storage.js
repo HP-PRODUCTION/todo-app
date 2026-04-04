@@ -4,13 +4,16 @@
 
 const storage = (() => {
   const STORAGE_KEY = 'todoAppData';
+  const BACKUP_VERSION = 1;
 
   /** Save the full application state object to localStorage. */
   function save(data) {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      return true;
     } catch (e) {
       console.error('storage.save failed:', e);
+      return false;
     }
   }
 
@@ -37,11 +40,18 @@ const storage = (() => {
    * Export the stored data as a downloadable JSON file.
    */
   function exportData() {
-    const data = load();
-    if (!data) {
+    const rawData = arguments.length > 0 ? arguments[0] : load();
+    const data = {
+      backupVersion: BACKUP_VERSION,
+      exportedAt: new Date().toISOString(),
+      data: rawData
+    };
+
+    if (!rawData) {
       alert('No data to export.');
-      return;
+      return false;
     }
+
     const json = JSON.stringify(data, null, 2);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -52,6 +62,7 @@ const storage = (() => {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
+    return true;
   }
 
   /**
@@ -61,12 +72,18 @@ const storage = (() => {
    */
   function importData(jsonString) {
     try {
-      const data = JSON.parse(jsonString);
-      // Basic schema validation
+      const parsed = JSON.parse(jsonString);
+      const data = parsed && parsed.data ? parsed.data : parsed;
+
       if (!data || !Array.isArray(data.tasks)) {
         throw new Error('Invalid backup format: "tasks" array missing.');
       }
-      save(data);
+
+      const ok = save(data);
+      if (!ok) {
+        throw new Error('Could not save imported backup to local storage.');
+      }
+
       return data;
     } catch (e) {
       console.error('storage.importData failed:', e);

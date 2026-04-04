@@ -18,6 +18,8 @@ A fully-featured, client-side To-Do list application built with **vanilla JavaSc
 - **Export / Import** – download or restore a JSON backup of all tasks
 - **Auto-save** – every change is persisted to `localStorage` automatically
 - **Dark mode** – toggle with the moon/sun icon; preference is saved across sessions
+- **Offline support (PWA)** – core assets are cached by a service worker
+- **Data hardening** – invalid/corrupted imported tasks are sanitized or discarded safely
 - **Fully responsive** – mobile, tablet and desktop layouts
 
 ---
@@ -105,6 +107,25 @@ python3 -m http.server 8000
   }
 }
 ```
+
+## Backup File Schema (Export)
+
+```json
+{
+  "backupVersion": 1,
+  "exportedAt": "2026-04-03T10:00:00.000Z",
+  "data": {
+    "tasks": [],
+    "settings": {
+      "theme": "light",
+      "sortBy": "createdAt",
+      "lastUpdated": "2026-04-03T10:00:00.000Z"
+    }
+  }
+}
+```
+
+The importer accepts both this wrapped format and legacy raw `{ tasks, settings }` JSON backups.
 
 ---
 
